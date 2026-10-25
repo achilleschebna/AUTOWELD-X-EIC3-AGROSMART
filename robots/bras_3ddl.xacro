@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Inertie simple, reutilisee pour chaque maillon -->
+  <xacro:macro name="inertie" params="z">
+    <inertial>
+      <origin xyz="0 0 ${z}" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- Commande d'une articulation par ros2_control -->
+  <xacro:macro name="commande" params="nom">
+    <joint name="${nom}">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Bras a 3 articulations -->
+  <xacro:macro name="bras_3ddl" params="prefix parent x y z">
+
+    <!-- Fixation du socle sur la scene -->
+    <joint name="${prefix}fixation" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}base_link"/>
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Socle -->
+    <link name="${prefix}base_link">
+      <visual>
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.12" length="0.10"/></geometry>
+        <material name="${prefix}gris"><color rgba="0.35 0.35 0.38 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.12" length="0.10"/></geometry>
+      </collision>
+      <xacro:inertie z="0.05"/>
+    </link>
+
+    <!-- Articulation 1 : rotation de la base (axe vertical) -->
+    <joint name="${prefix}joint_1" type="revolute">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}link_1"/>
+      <origin xyz="0 0 0.10" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-3.14" upper="3.14" effort="50" velocity="1.5"/>
+    </joint>
+
+    <!-- Colonne -->
+    <link name="${prefix}link_1">
+      <visual>
+        <origin xyz="0 0 0.15" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.06" length="0.30"/></geometry>
+        <material name="${prefix}bleu"><color rgba="0.15 0.35 0.75 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.15" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.06" length="0.30"/></geometry>
+      </collision>
+      <xacro:inertie z="0.15"/>
+    </link>
+
+    <!-- Articulation 2 : epaule (axe horizontal) -->
+    <joint name="${prefix}joint_2" type="revolute">
+      <parent link="${prefix}link_1"/>
+      <child link="${prefix}link_2"/>
+      <origin xyz="0 0 0.30" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.57" upper="1.57" effort="50" velocity="1.5"/>
+    </joint>
+
+    <!-- Bras -->
+    <link name="${prefix}link_2">
+      <visual>
+        <origin xyz="0 0 0.20" rpy="0 0 0"/>
+        <geometry><box size="0.08 0.08 0.40"/></geometry>
+        <material name="${prefix}vert"><color rgba="0.2 0.65 0.3 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.20" rpy="0 0 0"/>
+        <geometry><box size="0.08 0.08 0.40"/></geometry>
+      </collision>
+      <xacro:inertie z="0.20"/>
+    </link>
+
+    <!-- Articulation 3 : coude (axe horizontal) -->
+    <joint name="${prefix}joint_3" type="revolute">
+      <parent link="${prefix}link_2"/>
+      <child link="${prefix}link_3"/>
+      <origin xyz="0 0 0.40" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-2.0" upper="2.0" effort="30" velocity="1.5"/>
+    </joint>
+
+    <!-- Avant-bras -->
+    <link name="${prefix}link_3">
+      <visual>
+        <origin xyz="0 0 0.175" rpy="0 0 0"/>
+        <geometry><box size="0.06 0.06 0.35"/></geometry>
+        <material name="${prefix}jaune"><color rgba="0.9 0.75 0.15 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.175" rpy="0 0 0"/>
+        <geometry><box size="0.06 0.06 0.35"/></geometry>
+      </collision>
+      <xacro:inertie z="0.175"/>
+    </link>
+
+    <!-- Torche de soudage fictive -->
+    <joint name="${prefix}fixation_outil" type="fixed">
+      <parent link="${prefix}link_3"/>
+      <child link="${prefix}tool0"/>
+      <origin xyz="0 0 0.35" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${prefix}tool0">
+      <visual>
+        <origin xyz="0 0 0.06" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.02" length="0.12"/></geometry>
+        <material name="${prefix}orange"><color rgba="0.95 0.45 0.1 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.06" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.02" length="0.12"/></geometry>
+      </collision>
+      <xacro:inertie z="0.06"/>
+    </link>
+
+    <!-- Interface ros2_control : commande en position des 3 articulations -->
+    <ros2_control name="${prefix}systeme" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      <xacro:commande nom="${prefix}joint_1"/>
+      <xacro:commande nom="${prefix}joint_2"/>
+      <xacro:commande nom="${prefix}joint_3"/>
+    </ros2_control>
+
+  </xacro:macro>
+</robot>

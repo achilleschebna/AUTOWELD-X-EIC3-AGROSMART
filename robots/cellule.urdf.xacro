@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot name="cellule" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find autoweld_x_control)/robots/bras_3ddl.xacro"/>
+
+  <!-- Repere fixe de la scene -->
+  <link name="world"/>
+
+  <!-- Robot A -->
+  <xacro:bras_3ddl prefix="robot_a_" parent="world" x="-0.6" y="0.0" z="0.0"/>
+
+  <!-- Les robots B et C seront ajoutes ici plus tard -->
+
+  <!-- Plugin qui relie ros2_control a Gazebo -->
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find autoweld_x_control)/config/controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+</robot>
