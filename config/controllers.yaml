@@ -9,12 +9,42 @@ controller_manager:
     robot_a_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    robot_b_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    robot_c_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
 robot_a_controller:
   ros__parameters:
     joints:
       - robot_a_joint_1
       - robot_a_joint_2
       - robot_a_joint_3
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+robot_b_controller:
+  ros__parameters:
+    joints:
+      - robot_b_joint_1
+      - robot_b_joint_2
+      - robot_b_joint_3
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+robot_c_controller:
+  ros__parameters:
+    joints:
+      - robot_c_joint_1
+      - robot_c_joint_2
+      - robot_c_joint_3
     command_interfaces:
       - position
     state_interfaces:
