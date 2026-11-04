@@ -9,6 +9,11 @@ from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
 
 
+def spawner(nom):
+    return Node(package='controller_manager', executable='spawner',
+                arguments=[nom, '--controller-manager-timeout', '60'])
+
+
 def generate_launch_description():
     pkg = get_package_share_directory('autoweld_x_control')
     ros_gz_sim = get_package_share_directory('ros_gz_sim')
@@ -22,7 +27,7 @@ def generate_launch_description():
             os.path.join(ros_gz_sim, 'launch', 'gz_sim.launch.py')),
         launch_arguments={'gz_args': '-r empty.sdf'}.items())
 
-    # 2. Publication de la description du robot
+    # 2. Publication de la description de la cellule
     rsp = Node(package='robot_state_publisher', executable='robot_state_publisher',
                parameters=[{'robot_description': robot_description,
                             'use_sim_time': True}],
@@ -39,15 +44,15 @@ def generate_launch_description():
                   output='screen')
 
     # 5. Controleurs, lances l'un apres l'autre
-    jsb = Node(package='controller_manager', executable='spawner',
-               arguments=['joint_state_broadcaster',
-                          '--controller-manager-timeout', '60'])
-    robot_a = Node(package='controller_manager', executable='spawner',
-                   arguments=['robot_a_controller',
-                              '--controller-manager-timeout', '60'])
+    jsb = spawner('joint_state_broadcaster')
+    robot_a = spawner('robot_a_controller')
+    robot_b = spawner('robot_b_controller')
+    robot_c = spawner('robot_c_controller')
 
     return LaunchDescription([
         gazebo, rsp, bridge, spawn,
         RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[jsb])),
         RegisterEventHandler(OnProcessExit(target_action=jsb, on_exit=[robot_a])),
+        RegisterEventHandler(OnProcessExit(target_action=robot_a, on_exit=[robot_b])),
+        RegisterEventHandler(OnProcessExit(target_action=robot_b, on_exit=[robot_c])),
     ])

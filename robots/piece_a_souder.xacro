@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Piece a souder : socle + piece metallique + 3 cordons de soudure (visuels) -->
+  <xacro:macro name="piece_a_souder" params="parent">
+
+    <joint name="fixation_piece" type="fixed">
+      <parent link="${parent}"/>
+      <child link="piece_a_souder"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="piece_a_souder">
+      <inertial>
+        <origin xyz="0 0 0.30" rpy="0 0 0"/>
+        <mass value="20.0"/>
+        <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
+      </inertial>
+
+      <!-- Socle 0.50 x 0.50 x 0.20 -->
+      <visual>
+        <origin xyz="0 0 0.10" rpy="0 0 0"/>
+        <geometry><box size="0.50 0.50 0.20"/></geometry>
+        <material name="socle_gris"><color rgba="0.45 0.45 0.50 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.10" rpy="0 0 0"/>
+        <geometry><box size="0.50 0.50 0.20"/></geometry>
+      </collision>
+
+      <!-- Piece metallique 0.30 x 0.30 x 0.40 (de z=0.20 a z=0.60) -->
+      <visual>
+        <origin xyz="0 0 0.40" rpy="0 0 0"/>
+        <geometry><box size="0.30 0.30 0.40"/></geometry>
+        <material name="piece_acier"><color rgba="0.72 0.74 0.80 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.40" rpy="0 0 0"/>
+        <geometry><box size="0.30 0.30 0.40"/></geometry>
+      </collision>
+
+      <!-- Cordons de soudure : A face ouest, B face sud, C face nord -->
+      <visual>
+        <origin xyz="-0.15 0 0.45" rpy="0 0 0"/>
+        <geometry><box size="0.006 0.114 0.012"/></geometry>
+        <material name="cordon_a"><color rgba="0.85 0.15 0.10 1"/></material>
+      </visual>
+      <visual>
+        <origin xyz="0 -0.15 0.45" rpy="0 0 0"/>
+        <geometry><box size="0.114 0.006 0.012"/></geometry>
+        <material name="cordon_b"><color rgba="0.85 0.15 0.10 1"/></material>
+      </visual>
+      <visual>
+        <origin xyz="0 0.15 0.45" rpy="0 0 0"/>
+        <geometry><box size="0.114 0.006 0.012"/></geometry>
+        <material name="cordon_c"><color rgba="0.85 0.15 0.10 1"/></material>
+      </visual>
+    </link>
+
+  </xacro:macro>
+</robot>

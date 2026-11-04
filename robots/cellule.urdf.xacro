@@ -2,14 +2,18 @@
 <robot name="cellule" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find autoweld_x_control)/robots/bras_3ddl.xacro"/>
+  <xacro:include filename="$(find autoweld_x_control)/robots/piece_a_souder.xacro"/>
 
   <!-- Repere fixe de la scene -->
   <link name="world"/>
 
-  <!-- Robot A -->
-  <xacro:bras_3ddl prefix="robot_a_" parent="world" x="-0.6" y="0.0" z="0.0"/>
+  <!-- Piece a souder, au centre -->
+  <xacro:piece_a_souder parent="world"/>
 
-  <!-- Les robots B et C seront ajoutes ici plus tard -->
+  <!-- Robot A a l'ouest, robot B au sud, robot C au nord : tous face a la piece -->
+  <xacro:bras_3ddl prefix="robot_a_" parent="world" x="-0.8" y="0.0" z="0.0"/>
+  <xacro:bras_3ddl prefix="robot_b_" parent="world" x="0.0" y="-0.8" z="0.0"/>
+  <xacro:bras_3ddl prefix="robot_c_" parent="world" x="0.0" y="0.8" z="0.0"/>
 
   <!-- Plugin qui relie ros2_control a Gazebo -->
   <gazebo>
