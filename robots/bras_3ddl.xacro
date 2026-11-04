@@ -29,12 +29,12 @@
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
     </joint>
 
-    <!-- Socle -->
+    <!-- Socle : gris fonce -->
     <link name="${prefix}base_link">
       <visual>
         <origin xyz="0 0 0.05" rpy="0 0 0"/>
         <geometry><cylinder radius="0.12" length="0.10"/></geometry>
-        <material name="${prefix}gris"><color rgba="0.35 0.35 0.38 1"/></material>
+        <material name="${prefix}gris_fonce"><color rgba="0.175 0.175 0.175 1"/></material>
       </visual>
       <collision>
         <origin xyz="0 0 0.05" rpy="0 0 0"/>
@@ -52,12 +52,12 @@
       <limit lower="-3.14" upper="3.14" effort="50" velocity="1.5"/>
     </joint>
 
-    <!-- Colonne -->
+    <!-- Colonne : bloc jaune -->
     <link name="${prefix}link_1">
       <visual>
         <origin xyz="0 0 0.15" rpy="0 0 0"/>
-        <geometry><cylinder radius="0.06" length="0.30"/></geometry>
-        <material name="${prefix}bleu"><color rgba="0.15 0.35 0.75 1"/></material>
+        <geometry><box size="0.16 0.16 0.30"/></geometry>
+        <material name="${prefix}jaune_colonne"><color rgba="1 1 0 1"/></material>
       </visual>
       <collision>
         <origin xyz="0 0 0.15" rpy="0 0 0"/>
@@ -75,12 +75,17 @@
       <limit lower="-1.57" upper="1.57" effort="50" velocity="1.5"/>
     </joint>
 
-    <!-- Bras -->
+    <!-- Bras : moyeu d'epaule + bras jaunes -->
     <link name="${prefix}link_2">
+      <visual>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry><cylinder radius="0.065" length="0.18"/></geometry>
+        <material name="${prefix}jaune_moyeu_epaule"><color rgba="1 1 0 1"/></material>
+      </visual>
       <visual>
         <origin xyz="0 0 0.20" rpy="0 0 0"/>
         <geometry><box size="0.08 0.08 0.40"/></geometry>
-        <material name="${prefix}vert"><color rgba="0.2 0.65 0.3 1"/></material>
+        <material name="${prefix}jaune_bras"><color rgba="1 1 0 1"/></material>
       </visual>
       <collision>
         <origin xyz="0 0 0.20" rpy="0 0 0"/>
@@ -98,12 +103,22 @@
       <limit lower="-2.0" upper="2.0" effort="30" velocity="1.5"/>
     </joint>
 
-    <!-- Avant-bras -->
+    <!-- Avant-bras : moyeu de coude, tube et bloc de poignet jaunes -->
     <link name="${prefix}link_3">
       <visual>
-        <origin xyz="0 0 0.175" rpy="0 0 0"/>
-        <geometry><box size="0.06 0.06 0.35"/></geometry>
-        <material name="${prefix}jaune"><color rgba="0.9 0.75 0.15 1"/></material>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry><cylinder radius="0.055" length="0.14"/></geometry>
+        <material name="${prefix}jaune_moyeu_coude"><color rgba="1 1 0 1"/></material>
+      </visual>
+      <visual>
+        <origin xyz="0 0 0.145" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.035" length="0.29"/></geometry>
+        <material name="${prefix}jaune_avant_bras"><color rgba="1 1 0 1"/></material>
+      </visual>
+      <visual>
+        <origin xyz="0 0 0.32" rpy="0 0 0"/>
+        <geometry><box size="0.07 0.07 0.06"/></geometry>
+        <material name="${prefix}jaune_poignet"><color rgba="1 1 0 1"/></material>
       </visual>
       <collision>
         <origin xyz="0 0 0.175" rpy="0 0 0"/>
@@ -112,7 +127,7 @@
       <xacro:inertie z="0.175"/>
     </link>
 
-    <!-- Torche de soudage fictive -->
+    <!-- Torche de soudage fictive : noire -->
     <joint name="${prefix}fixation_outil" type="fixed">
       <parent link="${prefix}link_3"/>
       <child link="${prefix}tool0"/>
@@ -121,9 +136,14 @@
 
     <link name="${prefix}tool0">
       <visual>
-        <origin xyz="0 0 0.06" rpy="0 0 0"/>
-        <geometry><cylinder radius="0.02" length="0.12"/></geometry>
-        <material name="${prefix}orange"><color rgba="0.95 0.45 0.1 1"/></material>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.035" length="0.02"/></geometry>
+        <material name="${prefix}noir_disque"><color rgba="0.05 0.05 0.05 1"/></material>
+      </visual>
+      <visual>
+        <origin xyz="0 0 0.07" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.015" length="0.10"/></geometry>
+        <material name="${prefix}noir_torche"><color rgba="0.05 0.05 0.05 1"/></material>
       </visual>
       <collision>
         <origin xyz="0 0 0.06" rpy="0 0 0"/>
