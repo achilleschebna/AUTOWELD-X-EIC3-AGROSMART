@@ -118,14 +118,22 @@ Quatre contrôleurs doivent être `active` : `joint_state_broadcaster`, `robot_a
 ```bash
 python3 src/autoweld_x_control/autoweld_x_control/sequence_soudure.py cycle
 ```
+*(ou après compilation colcon : `ros2 run autoweld_x_control sequence_soudure cycle`)*
 
 | Commande | Effet |
 |----------|-------|
 | `... sequence_soudure.py cycle` | Les trois robots soudent l'un après l'autre (environ 16 s chacun), puis le programme s'arrête (valeur par défaut). |
 | `... sequence_soudure.py approche` | Les trois robots se placent en position d'approche, en même temps. |
 | `... sequence_soudure.py repos` | Les trois robots reviennent à la verticale, en même temps. |
+| `... sequence_soudure.py urgence` | Arrêt d'urgence immédiat et repli de sécurité de tous les bras au repos (E-STOP). |
 
 **Résultat attendu.** Chaque torche s'approche de sa face de la pièce, parcourt lentement le cordon rouge, se retire et revient à la verticale. Le terminal affiche la réservation de la zone (`[ZONE] reservee par robot_a`, puis `liberee`) et se termine par `Cycle termine : tous les robots sont au repos.` Arrêtez la simulation avec **Ctrl + C**.
+
+**Campagne de tests automatisés (sans simulateur) :**
+```bash
+python -m unittest tests/test_sequenceur.py
+```
+*(Valide l'exclusion mutuelle, l'absence de collision, les limites articulaires et la chronologie des cycles. Voir [`tests/procedure_de_test.md`](tests/procedure_de_test.md)).*
 
 **En cas de fenêtre Gazebo noire** (pas d'accélération graphique sous WSL 2) :
 ```bash
@@ -140,7 +148,7 @@ AUTOWELD-X-EIC3-AGROSMART/
 ├── src/
 │   └── autoweld_x_control/            # paquet ROS 2 (Python)
 │       ├── autoweld_x_control/
-│       │   └── sequence_soudure.py    # scénario automatique + coordination
+│       │   └── sequence_soudure.py    # scénario automatique + coordination + E-STOP
 │       ├── launch/cell_sim.launch.py  # lancement de la simulation
 │       ├── robots  -> ../../robots    # liens symboliques vers les dossiers
 │       ├── config  -> ../../config    # ci-dessous, vus par le paquet
@@ -153,6 +161,8 @@ AUTOWELD-X-EIC3-AGROSMART/
 ├── simulation/                        # mondes Gazebo
 ├── screenshots/                       # captures d'écran
 ├── tests/                             # procédures et résultats de tests
+│   ├── test_sequenceur.py             # tests unitaires automatisés
+│   └── procedure_de_test.md           # protocole et journal de validation
 ├── docs/                              # contributions, architecture
 ├── presentation/                      # diapositives
 └── demo/                              # lien de la vidéo
@@ -168,7 +178,7 @@ AUTOWELD-X-EIC3-AGROSMART/
 
 **Lancement (`launch/cell_sim.launch.py`).** Le fichier démarre Gazebo, publie la description de la cellule, fait apparaître la scène, relie l'horloge de simulation à ROS 2, puis lance les contrôleurs l'un après l'autre (chaque lancement attend la fin du précédent, ce qui évite les conflits de démarrage).
 
-**Scénario (`sequence_soudure.py`).** Un nœud ROS 2 envoie à chaque robot une trajectoire à cinq points : approche, début du cordon, fin du cordon, retrait, retour au repos. Il attend en **temps de simulation** (et non en temps réel), de sorte que le scénario reste correct même si la simulation est ralentie. À la fin de chaque cycle, il vérifie que le robot est bien revenu au repos, puis le programme se termine.
+**Scénario (`sequence_soudure.py`).** Un nœud ROS 2 envoie à chaque robot une trajectoire à cinq points : approche, début du cordon, fin du cordon, retrait, retour au repos. Il attend en **temps de simulation** (et non en temps réel), de sorte que le scénario reste correct même si la simulation est ralentie. À la fin de chaque cycle, il vérifie que le robot est bien revenu au repos, puis le programme se termine. Un mode `urgence` permet l'interruption propre et le repli instantané (E-STOP).
 
 **Calcul des poses.** Les angles d'approche et de soudure ont été calculés par cinématique inverse d'un bras plan à deux segments (loi des cosinus), à partir de la géométrie réelle du modèle : torche à 3 cm de la face à souder, cordon parcouru en tournant la base de ±0,09 rad (environ ±5,7 cm).
 
@@ -217,7 +227,7 @@ Les captures sont dans le dossier [`screenshots/`](screenshots/) :
 - Autoriser le travail simultané de plusieurs robots grâce à des réservations de sous-zones.
 - Simuler le contact et le dépôt de matière le long du cordon (étincelles, cordon progressif).
 - Ajouter une caméra et un module de détection pour repérer la pièce et ses points de soudure.
-- Ajouter des tests automatiques (poses, limites articulaires, absence de collision).
+- *Tests unitaires automatisés validés* (inscrits dans `tests/test_sequenceur.py`).
 
 ## Références
 

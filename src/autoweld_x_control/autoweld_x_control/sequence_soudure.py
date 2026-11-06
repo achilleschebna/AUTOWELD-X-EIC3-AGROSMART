@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 """Sequence automatique de soudage fictif (AUTOWELD-X).
 
+Equipe AGROSMART-X - EIC 3.0
+Responsable : NAIVELANDE Fortunat (Scenarios automatises et sequenceur)
+
 Usage :
     python3 sequence_soudure.py cycle      # les 3 robots soudent l'un apres l'autre (defaut)
     python3 sequence_soudure.py repos      # les 3 robots reviennent a la verticale, d'un coup
     python3 sequence_soudure.py approche   # les 3 robots se placent en approche, d'un coup
+    python3 sequence_soudure.py urgence    # arret d'urgence et repli de securite (E-STOP)
 """
 import sys
 import time
 
-import rclpy
-from builtin_interfaces.msg import Duration
-from rclpy.node import Node
-from rclpy.parameter import Parameter
-from sensor_msgs.msg import JointState
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+try:
+    import rclpy
+    from builtin_interfaces.msg import Duration
+    from rclpy.node import Node
+    from rclpy.parameter import Parameter
+    from sensor_msgs.msg import JointState
+    from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+    RCLPY_AVAILABLE = True
+except ImportError:
+    RCLPY_AVAILABLE = False
+    Node = object
 
 # Angle de la base de chaque robot pour faire face a la piece (rad)
 ROBOTS = {'robot_a': 0.0, 'robot_b': 1.5708, 'robot_c': -1.5708}
@@ -28,16 +37,19 @@ TOLERANCE = 0.05              # ecart accepte a l'arrivee (rad)
 
 
 def duree(secondes):
-    d = Duration()
-    d.sec = int(secondes)
-    d.nanosec = int((secondes - int(secondes)) * 1e9)
-    return d
+    """Convertit un nombre flottant de secondes en structure Duration ROS 2."""
+    if RCLPY_AVAILABLE:
+        d = Duration()
+        d.sec = int(secondes)
+        d.nanosec = int((secondes - int(secondes)) * 1e9)
+        return d
+    return {'sec': int(secondes), 'nanosec': int((secondes - int(secondes)) * 1e9)}
 
 
 class ZonePartagee:
-    """Verrou : un seul robot a la fois dans la zone de travail autour de la piece."""
+    """Verrou d'exclusion mutuelle : un seul robot a la fois dans la zone critique."""
 
-    def __init__(self, logger):
+    def __init__(self, logger=None):
         self.proprietaire = None
         self.logger = logger
 
@@ -45,13 +57,15 @@ class ZonePartagee:
         if self.proprietaire is not None:
             raise RuntimeError(f'Zone deja occupee par {self.proprietaire}')
         self.proprietaire = robot
-        self.logger.info(f'[ZONE] reservee par {robot}')
+        if self.logger:
+            self.logger.info(f'[ZONE] reservee par {robot}')
 
     def liberer(self, robot):
         if self.proprietaire != robot:
             raise RuntimeError(f'{robot} ne possede pas la zone')
         self.proprietaire = None
-        self.logger.info(f'[ZONE] liberee par {robot}')
+        if self.logger:
+            self.logger.info(f'[ZONE] liberee par {robot}')
 
 
 class CelluleSoudure(Node):
@@ -122,6 +136,13 @@ class CelluleSoudure(Node):
             self.envoyer(robot, [(q, 4.0)])
         self.attendre(5.0)
 
+    def arret_urgence(self):
+        """Securite simulee (E-STOP) : repli rapide de tous les bras au repos."""
+        self.get_logger().warn('[SECURITE] Arret d\'urgence active : retour immediat au repos.')
+        for robot, q1 in ROBOTS.items():
+            self.envoyer(robot, [([q1, 0.0, 0.0], 2.0)])
+        self.attendre(2.5)
+
     def cycle(self, robot):
         """Un cycle de soudure complet pour un robot, puis retour au repos."""
         q1 = ROBOTS[robot]
@@ -142,6 +163,10 @@ class CelluleSoudure(Node):
 
 
 def main():
+    if not RCLPY_AVAILABLE:
+        print("Erreur : rclpy non disponible. Veuillez executer ce script dans un environnement ROS 2.")
+        sys.exit(1)
+
     mode = sys.argv[1] if len(sys.argv) > 1 else 'cycle'
     rclpy.init()
     noeud = CelluleSoudure()
@@ -150,17 +175,26 @@ def main():
         if mode in ('repos', 'approche'):
             noeud.get_logger().info(f'Les 3 robots passent en position : {mode}')
             noeud.tous(mode)
+        elif mode in ('urgence', 'estop'):
+            noeud.arret_urgence()
         else:
             zone = ZonePartagee(noeud.get_logger())
+            t_debut = time.time()
             noeud.get_logger().info('Cycle automatique : mise au repos initiale')
             noeud.tous('repos')
             for robot in ORDRE:
                 zone.reserver(robot)
                 noeud.cycle(robot)
                 zone.liberer(robot)
-            noeud.get_logger().info('Cycle termine : tous les robots sont au repos.')
+            t_total = time.time() - t_debut
+            noeud.get_logger().info(
+                f'Cycle termine avec succes en {t_total:.1f} s : tous les robots sont au repos.')
     except KeyboardInterrupt:
-        noeud.get_logger().warn('Interrompu par l\'utilisateur')
+        noeud.get_logger().warn('Interrompu par l\'utilisateur : declenchement du repli de securite')
+        try:
+            noeud.arret_urgence()
+        except Exception:
+            pass
     finally:
         noeud.destroy_node()
         if rclpy.ok():

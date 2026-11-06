@@ -22,10 +22,11 @@ setup(
     maintainer='etudiant',
     maintainer_email='etudiant@example.com',
     description='Package de controle pour AUTOWELD-X',
-    license='TODO: License declaration',
+    license='Apache-2.0',
     extras_require={'test': ['pytest']},
     entry_points={
         'console_scripts': [
+            'sequence_soudure = autoweld_x_control.sequence_soudure:main',
         ],
     },
 )
