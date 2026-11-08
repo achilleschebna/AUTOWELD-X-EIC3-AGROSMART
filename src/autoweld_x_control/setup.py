@@ -27,6 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'sequence_soudure = autoweld_x_control.sequence_soudure:main',
+            'coordinator = autoweld_x_control.coordinator:main',
         ],
     },
 )

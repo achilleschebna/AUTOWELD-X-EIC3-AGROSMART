@@ -1,0 +1,70 @@
+01:54:54.200 === Debut du test de coordination A/B ===
+01:54:54.203 [B] va vers depart (x_outil=+0.80 m)
+01:54:54.205 [A] va vers depart (x_outil=-0.80 m)
+01:54:57.711 [B] a atteint depart
+01:54:57.712 [B] va vers approche (x_outil=+0.30 m)
+01:54:57.713 [A] a atteint depart
+01:54:57.714 [A] va vers approche (x_outil=-0.30 m)
+01:55:02.889 [B] a atteint approche
+01:55:02.892 [A] a atteint approche
+01:55:02.895 [B] demande la zone pour travail_1 (x_outil=+0.08 m)
+01:55:02.896 [B] ENTRE dans la zone
+01:55:02.896 [B] va vers travail_1 (x_outil=+0.08 m)
+01:55:02.895 [A] demande la zone pour travail_1 (x_outil=-0.08 m)
+01:55:02.908 [A] ATTEND : zone occupee par B
+01:55:06.398 [B] a atteint travail_1
+01:55:06.399 [B] va vers travail_2 (x_outil=+0.12 m)
+01:55:09.902 [B] a atteint travail_2
+01:55:09.903 [B] va vers retrait (x_outil=+0.30 m)
+01:55:13.405 [B] a atteint retrait
+01:55:13.409 [A] ENTRE dans la zone
+01:55:13.412 [B] LIBERE la zone
+01:55:13.413 [B] va vers retour (x_outil=+0.80 m)
+01:55:13.413 [A] va vers travail_1 (x_outil=-0.08 m)
+01:55:16.916 [B] a atteint retour
+01:55:16.916 [A] a atteint travail_1
+01:55:16.919 [A] va vers travail_2 (x_outil=-0.12 m)
+01:55:16.920 [B] cycle termine
+01:55:20.421 [A] a atteint travail_2
+01:55:20.422 [A] va vers retrait (x_outil=-0.30 m)
+01:55:23.924 [A] a atteint retrait
+01:55:23.924 [A] LIBERE la zone
+01:55:23.925 [A] va vers retour (x_outil=-0.80 m)
+01:55:27.427 [A] a atteint retour
+01:55:27.428 [A] cycle termine
+01:55:27.429 === Fin du test ===
+01:56:03.327 === Debut du test de coordination A/B ===
+01:56:03.333 [B] va vers depart (x_outil=+0.80 m)
+01:56:03.339 [A] va vers depart (x_outil=-0.80 m)
+01:56:06.836 [B] a atteint depart
+01:56:06.838 [B] va vers approche (x_outil=+0.30 m)
+01:56:06.841 [A] a atteint depart
+01:56:06.842 [A] va vers approche (x_outil=-0.30 m)
+01:56:11.898 [B] a atteint approche
+01:56:11.899 [B] demande la zone pour travail_1 (x_outil=+0.08 m)
+01:56:11.899 [B] ENTRE dans la zone
+01:56:11.900 [B] va vers travail_1 (x_outil=+0.08 m)
+01:56:11.902 [A] a atteint approche
+01:56:11.903 [A] demande la zone pour travail_1 (x_outil=-0.08 m)
+01:56:11.904 [A] ATTEND : zone occupee par B
+01:56:15.405 [B] a atteint travail_1
+01:56:15.407 [B] va vers travail_2 (x_outil=+0.12 m)
+01:56:18.908 [B] a atteint travail_2
+01:56:18.910 [B] va vers retrait (x_outil=+0.30 m)
+01:56:22.413 [B] a atteint retrait
+01:56:22.413 [B] LIBERE la zone
+01:56:22.414 [B] va vers retour (x_outil=+0.80 m)
+01:56:22.415 [A] ENTRE dans la zone
+01:56:22.416 [A] va vers travail_1 (x_outil=-0.08 m)
+01:56:25.916 [B] a atteint retour
+01:56:25.919 [B] cycle termine
+01:56:25.918 [A] a atteint travail_1
+01:56:25.920 [A] va vers travail_2 (x_outil=-0.12 m)
+01:56:29.426 [A] a atteint travail_2
+01:56:29.426 [A] va vers retrait (x_outil=-0.30 m)
+01:56:32.928 [A] a atteint retrait
+01:56:32.932 [A] LIBERE la zone
+01:56:32.933 [A] va vers retour (x_outil=-0.80 m)
+01:56:36.438 [A] a atteint retour
+01:56:36.439 [A] cycle termine
+01:56:36.440 === Fin du test ===
