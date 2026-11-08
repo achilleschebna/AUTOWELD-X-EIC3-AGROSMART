@@ -44,3 +44,19 @@ Link a_torch_wire with parent joint a_torch_wire_joint has 1 child joint: a_torc
 world
 Root Link world has 1 child joint: a_fixation. This link has NO geometry.
 
+
+## Hervens PIERRE (n°11) : programmation Python / logique de contrôle
+
+Réalisé :
+- Installation et configuration de l'environnement (WSL 2, Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic 8.15.0, MoveIt 2, ros2_control, colcon), vérifiés par des commandes de contrôle.
+- Compilation du dépôt complet et lancement de la cellule : les 4 contrôleurs (joint_state_broadcaster et robots A, B, C) sont actifs.
+- Module `src/autoweld_x_control/autoweld_x_control/verification.py` : vérifie les limites articulaires, la croissance des temps et la vitesse maximale (1,5 rad/s) d'une trajectoire avant son envoi.
+- Tests `tests/test_verification.py` : 8 tests, tous réussis. L'un d'eux contrôle le cycle réel de `sequence_soudure.py` pour les 3 robots.
+- Exécution du cycle complet `sequence_soudure.py cycle` : terminé avec succès en 286,9 s (temps mesuré sur ma machine), voir `tests/procedure_de_test.md`.
+- Captures d'écran : `screenshots/Hervens_01` à `Hervens_05`.
+
+Limites :
+- `verification.py` n'est pas encore branché dans `sequence_soudure.py` (fichier de Fortunat NAÏVELANDE) : il est utilisé par ses tests.
+- Pas de journal d'exécution en fichier, pas de travail simultané des robots.
+
+Commits : 6d10660 (module et tests), 6b55038 (captures), branche `hervens-verification`.

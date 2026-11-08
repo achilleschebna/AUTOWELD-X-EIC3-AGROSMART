@@ -104,3 +104,18 @@ python3 src/autoweld_x_control/autoweld_x_control/sequence_soudure.py urgence
 ## 5. Conclusion des tests
 
 L'ensemble des exigences du cahier des charges relatives aux **scénarios automatisés, au séquenceur et à la sécurité multi-robots** est pleinement validé. Aucun risque de collision matérielle n'est possible grâce à l'architecture d'exclusion mutuelle à verrou unique.
+
+---
+
+## 6. Mesures relevées par Hervens PIERRE (8 novembre 2026)
+
+Ces mesures proviennent d'une exécution réelle sur WSL 2 (Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic 8.15.0).
+
+| Mesure | Valeur relevée |
+|---|---|
+| Tests unitaires `tests/test_sequenceur.py` | 9 tests, OK |
+| Tests unitaires `tests/test_verification.py` | 8 tests, OK |
+| Durée du cycle complet (`sequence_soudure.py cycle`) | 286,9 s |
+| Durée par robot (horodatages du journal) | A : environ 55 s, B : environ 96 s, C : environ 121 s |
+
+Remarque : le programme attend en temps de simulation et prévoit environ 15 s par robot. Sur cette machine, la simulation s'exécute plus lentement que le temps réel, donc les durées mesurées sont supérieures aux valeurs de la section 3 (15,8 s et 48,2 s). Le nombre de tests est de 9 et non 7 (section 2). Les valeurs des sections 3 et 4 n'ont pas été reproduites sur cette machine.
