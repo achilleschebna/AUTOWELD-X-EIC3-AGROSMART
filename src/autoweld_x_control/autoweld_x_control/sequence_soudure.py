@@ -25,6 +25,12 @@ except ImportError:
     RCLPY_AVAILABLE = False
     Node = object
 
+# Verification des trajectoires avant envoi (module de Hervens PIERRE)
+try:
+    from verification import verifier_trajectoire
+except ImportError:
+    from autoweld_x_control.verification import verifier_trajectoire
+
 # Angle de la base de chaque robot pour faire face a la piece (rad)
 ROBOTS = {'robot_a': 0.0, 'robot_b': 1.5708, 'robot_c': -1.5708}
 ORDRE = ['robot_a', 'robot_b', 'robot_c']
@@ -109,7 +115,20 @@ class CelluleSoudure(Node):
                 return
             rclpy.spin_once(self, timeout_sec=0.05)
 
-    def envoyer(self, robot, points):
+    def envoyer(self, robot, points, verifier=True):
+        # Controle avant envoi. Desactive pour l'arret d'urgence : le repli de
+        # securite ne doit jamais etre bloque par une verification.
+        if verifier:
+            depart = [self.etat.get(f'{robot}_joint_{i}') for i in (1, 2, 3)]
+            if None in depart:
+                depart = None
+            erreurs = verifier_trajectoire(points, depart=depart)
+            if erreurs:
+                for e in erreurs:
+                    self.get_logger().error(f'[VERIF] {robot} : {e}')
+                raise RuntimeError(f'Trajectoire refusee pour {robot}')
+            self.get_logger().info(
+                f'[VERIF] {robot} : trajectoire valide ({len(points)} point(s))')
         msg = JointTrajectory()
         msg.joint_names = [f'{robot}_joint_{i}' for i in (1, 2, 3)]
         for positions, t in points:
@@ -140,7 +159,7 @@ class CelluleSoudure(Node):
         """Securite simulee (E-STOP) : repli rapide de tous les bras au repos."""
         self.get_logger().warn('[SECURITE] Arret d\'urgence active : retour immediat au repos.')
         for robot, q1 in ROBOTS.items():
-            self.envoyer(robot, [([q1, 0.0, 0.0], 2.0)])
+            self.envoyer(robot, [([q1, 0.0, 0.0], 2.0)], verifier=False)
         self.attendre(2.5)
 
     def cycle(self, robot):
